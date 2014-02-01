@@ -10,12 +10,10 @@ class Scaner:
         for item in content:
             p = workdir+item
             if os.path.isdir(p):
-                print(item,'is directory!')
                 self.folders.append(item)
                 check = os.listdir(p)
                 for o in check:
                     if os.path.isdir(p+'\\'+o):
-                        print(item,'\\',o,'is directory!')
                         self.folders.append(item+'\\'+o)
             else: self.episodes.append(item)
         self.episodes.sort()
@@ -66,7 +64,7 @@ class Episode:
         os.system(query)
 
     def repack(self):
-        query = 'mkvmerge -o "' + workdir + '8bit\\' + self.name + '.mkv" -A "' + self.name + '.x264" "' + self.audio + '" "' + self.subs + '"'
+        query = 'mkvmerge -o "' + workdir + '8bit\\' + self.name + '.mkv" -A "' + self.name + '.x264" --forced-track "0:yes" --default-track "0:yes" "' + self.audio + '" --forced-track "0:yes" --default-track "0:yes" "' + self.subs + '"'
         os.system(query)
 
     def letsgo(self):
