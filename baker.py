@@ -8,11 +8,16 @@ class Scaner:
     def __init__(self,path):
         content = os.listdir(path)
         for item in content:
-            if '.mka' in item or '.ass' in item: pass
-            elif '.mkv' in item:
-                self.episodes.append(item)
-            else:
+            p = workdir+item
+            if os.path.isdir(p):
+                print(item,'is directory!')
                 self.folders.append(item)
+                check = os.listdir(p)
+                for o in check:
+                    if os.path.isdir(p+'\\'+o):
+                        print(item,'\\',o,'is directory!')
+                        self.folders.append(item+'\\'+o)
+            else: self.episodes.append(item)
         self.episodes.sort()
         self.quantity = len(self.episodes)
 
