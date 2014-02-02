@@ -15,7 +15,7 @@ class Scaner:
                 for o in check:
                     if os.path.isdir(p+'\\'+o):
                         self.folders.append(item+'\\'+o)
-            else: self.episodes.append(item)
+            elif '.mkv' in item: self.episodes.append(item)
         self.episodes.sort()
         self.quantity = len(self.episodes)
 
@@ -103,6 +103,7 @@ class Series:
             i += 1
             if n == 0: break
         print("Enough cooking. That's all.")
+        input()
             
 print("\nLet's bake some 8bit single-file anime episodes!")
 s = Series(workdir)
