@@ -33,13 +33,13 @@ class Scaner:
         a_type = ''
         s_type = ''
         if folder1 != folder2:
-            a_type = os.listdir(folder1)[0].split(sep='.')[1]
-            s_type = os.listdir(folder2)[0].split(sep='.')[1]
+            a_type = os.listdir(folder1)[0].split(sep='.')[-1]
+            s_type = os.listdir(folder2)[0].split(sep='.')[-1]
         else:
             a_types = ['mka','acc','ac3','flac']
             s_types = ['srt','ass']
             for file in os.listdir(folder1):
-                extension = file.split(sep='.')[1]
+                extension = file.split(sep='.')[-1]
                 if extension in a_types: a_type = extension
                 elif extension in s_types: s_type = extension
                 if a_type != '' and s_type != '': break
