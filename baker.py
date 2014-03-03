@@ -1,6 +1,9 @@
 import os
+from tkinter import filedialog,Tk
 
-workdir = 'driveletter:\\folder\\anime\\'
+root = Tk()
+root.withdraw()
+workdir = filedialog.askdirectory() + '\\'
 
 class Scaner:
     episodes = []
@@ -9,7 +12,7 @@ class Scaner:
         content = os.listdir(path)
         for item in content:
             p = workdir+item
-            if os.path.isdir(p):
+            if os.path.isdir(p) and item != '8bit':
                 self.folders.append(item)
                 check = os.listdir(p)
                 for o in check:
@@ -64,26 +67,28 @@ class Episode:
         os.system(query)
 
     def repack(self):
-        query = 'mkvmerge -o "' + workdir + '8bit\\' + self.name + '.mkv" -A "' + self.name + '.x264" --forced-track "0:yes" --default-track "0:yes" "' + self.audio + '" --forced-track "0:yes" --default-track "0:yes" "' + self.subs + '"'
+        if not os.path.exists(workdir + '8bit'):
+            os.makedirs(workdir + '8bit')
+        query = 'mkvmerge -q -o "' + workdir + '8bit\\' + self.name + '.mkv" -A "' + self.name + '.x264" --forced-track "0:yes" --default-track "0:yes" "' + self.audio + '" --forced-track "0:yes" --default-track "0:yes" "' + self.subs + '"'
         os.system(query)
 
     def letsgo(self):
-        print('\n   Baking video from', self.name)
+        print('\nBaking video from', self.name)
         self.ten2eight()
-        print('\n   Converted! Packing sound and subtitles...\n')
+        print('Converted! Packing sound and subtitles...\n')
         self.repack()
         self.name = self.name + '.x264'
         os.remove(self.name)
-        print('\n   Episode', self.name, 'baked! Enjoy your meal! :3\n')
+        print('\n   Episode ready!')
     
 class Series:
 
     def __init__(self, workdir):
         self.folder = workdir
-        print('\nWORKING WITH:',self.folder)
+        print('\nAnime folder:',self.folder)
         content = Scaner(self.folder)
         self.quantity = content.howmany()
-        print('\n# of episodes:',self.quantity)
+        print('   # of episodes:',self.quantity)
         content.list_folders()
         self.audio_folder = workdir + content.getfolder(int(input('\nChoose AUDIO folder: ')))
         self.subtitles_folder = workdir + content.getfolder(int(input('Choose SUBTITLES folder: ')))
@@ -94,18 +99,21 @@ class Series:
 
     def bake(self):
         i = 1
-        start = int(input('Work with episodes starting with: '))
-        n = int(input('And how many episodes are you up to? '))
+        start = int(input('Start from episode #'))
+        n = int(input('End with episode #')) - start + 1
+        off = input('Do you want to shutdown PC afterwards? (y/n) ')
         while i<self.quantity:
             if i>=start:
                 self.episodes[i-1].letsgo()
                 n -= 1
             i += 1
             if n == 0: break
-        print("Enough cooking. That's all.")
+        print("Enough baking for now. Enjoy your meal!")
+        if off == 'y' or off == 'Y': os.system('shutdown -s')
         input()
             
-print("\nLet's bake some 8bit single-file anime episodes!")
+os.system('cls')
+print('\t\t=== Welcome to the Bakery! ===')
+print('\nHere you can bake some 8bit single-file anime episodes.')
 s = Series(workdir)
 s.bake()
-    
