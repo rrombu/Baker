@@ -19,10 +19,9 @@ except AttributeError:
 
 
 class Anime():
-    episodes = []
-    params = {'': False}
-
     def __init__(self, path):
+        self.episodes = []
+        self.params = {'': False}
         self.folder = path
         content = os.listdir(self.folder)
         for item in content:
@@ -42,10 +41,16 @@ class Anime():
         return self.episodes[n][:-4]
 
 
-class Converter():
-    need_convert = False
-    audio = [False, 'path', 'params']
-    subs = [False, 'path', 'params']
+class Converter(QtCore.QThread):
+    update = QtCore.pyqtSignal()
+    finished = QtCore.pyqtSignal()
+    def __init__(self, mw):
+        super(Converter, self).__init__()
+        self.need_convert = False
+        self.audio = [False, 'path', 'params']
+        self.subs = [False, 'path', 'params']
+        self.first = 0
+        self.last = 0
 
     def x264(self, folder, file):
         preset = 'x264 --tune animation --profile high --level 4.2 --crf 17 --fps 23.976 --preset fast -o "'
@@ -60,7 +65,7 @@ class Converter():
         v8 = '"' + file + '.x264" '
         a = '--forced-track "0:yes" --default-track "0:yes" "' + self.audio[1] + '\\' + file + '.mka" '
         s = '--forced-track "0:yes" --default-track "0:yes" "' + self.subs[1] + '\\' + file + '.ass" '
-        query = 'mkvmerge -o "' + folder + '\\8bit\\' + file + '.mkv" '  # TODO: прибавить исходный файл
+        query = 'mkvmerge -o "' + folder + '\\8bit\\' + file + '.mkv" '
         if self.need_convert:
             query += (v8 + '-D ')
         query += v
@@ -69,16 +74,15 @@ class Converter():
         if self.subs[0]:
             query += s
         print(query)
-        #os.system(query)
-        process = QtCore.QProcess(MainWindow)
-        process.startDetached(query)
+        os.system(query)
 
-    def convert(self, start, end):
-        for i in range(start, end+1):
+    def run(self):
+        for i in range(self.first, self.last+1):
             if self.need_convert:
                 self.x264(anime.folder, anime.episode(i-1))
             self.mkvmerge(anime.folder, anime.episode(i-1))
-
+            self.update.emit()
+        self.finished.emit()
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -137,15 +141,13 @@ class Ui_MainWindow(object):
         self.runButton.setObjectName(_fromUtf8("runButton"))
         self.horizontalLayout_2.addWidget(self.runButton)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
-        '''self.progressBar = QtGui.QProgressBar(self.layoutWidget1)
+        self.progressBar = QtGui.QProgressBar(self.layoutWidget1)
         self.progressBar.setAutoFillBackground(False)
-        self.progressBar.setMinimum(0)
         self.progressBar.setMaximum(0)
-        self.progressBar.setProperty("value", 24)
-        self.progressBar.setTextVisible(True)
-        self.progressBar.setInvertedAppearance(False)
+        self.progressBar.setTextVisible(False)
         self.progressBar.setObjectName(_fromUtf8("progressBar"))
-        self.verticalLayout_3.addWidget(self.progressBar)'''
+        self.progressBar.setVisible(False)
+        self.verticalLayout_3.addWidget(self.progressBar)
         self.layoutWidget2 = QtGui.QWidget(self.centralwidget)
         self.layoutWidget2.setGeometry(QtCore.QRect(10, 100, 331, 81))
         self.layoutWidget2.setObjectName(_fromUtf8("layoutWidget2"))
@@ -173,9 +175,6 @@ class Ui_MainWindow(object):
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.start = QtGui.QSpinBox(self.layoutWidget2)
-        self.start.setToolTip(_fromUtf8(""))
-        self.start.setStatusTip(_fromUtf8(""))
-        self.start.setWhatsThis(_fromUtf8(""))
         self.start.setObjectName(_fromUtf8("start"))
         self.start.setMinimum(1)
         self.horizontalLayout.addWidget(self.start)
@@ -184,9 +183,6 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.horizontalLayout.addWidget(self.label_2)
         self.end = QtGui.QSpinBox(self.layoutWidget2)
-        self.end.setToolTip(_fromUtf8(""))
-        self.end.setStatusTip(_fromUtf8(""))
-        self.end.setWhatsThis(_fromUtf8(""))
         self.end.setObjectName(_fromUtf8("end"))
         self.end.setMinimum(1)
         self.horizontalLayout.addWidget(self.end)
@@ -214,14 +210,12 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu.menuAction())
 
         self.retranslateUi(MainWindow)
-        QtCore.QObject.connect(self.resetButton, QtCore.SIGNAL(_fromUtf8("clicked()")), lambda l=False: self.convertBox.setChecked(l))
-        QtCore.QObject.connect(self.resetButton, QtCore.SIGNAL(_fromUtf8("clicked()")), lambda l=False: self.audioBox.setChecked(l))
-        QtCore.QObject.connect(self.resetButton, QtCore.SIGNAL(_fromUtf8("clicked()")), lambda l=False: self.subBox.setChecked(l))
-        QtCore.QObject.connect(self.convertBox, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), lambda l: self.set_convert(l))
-        QtCore.QObject.connect(self.audioBox, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), lambda l: self.set_audio(l))
-        QtCore.QObject.connect(self.subBox, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), lambda l: self.set_subs(l))
-        QtCore.QObject.connect(self.runButton, QtCore.SIGNAL(_fromUtf8("clicked()")), self.bake)
-        QtCore.QObject.connect(self.start, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), lambda l: self.end.setMinimum(l))
+        self.resetButton.clicked.connect(self.abort)
+        self.convertBox.toggled.connect(lambda l: self.set_convert(l))
+        self.audioBox.toggled.connect(lambda l: self.set_audio(l))
+        self.subBox.toggled.connect(lambda l: self.set_subs(l))
+        self.runButton.clicked.connect(self.bake)
+        self.start.valueChanged.connect(lambda l: self.end.setMinimum(l))
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -235,7 +229,6 @@ class Ui_MainWindow(object):
         self.bitLabel.setText(_translate("MainWindow", "-", None))
         self.runButton.setText(_translate("MainWindow", "Bake!", None))
         self.resetButton.setText(_translate("MainWindow", "Reset", None))
-        #self.progressBar.setFormat(_translate("MainWindow", "%p %", None))
         self.convertBox.setText(_translate("MainWindow", "Convert 10bit -> 8 bit", None))
         self.audioBox.setText(_translate("MainWindow", "Include separate audio", None))
         self.subBox.setText(_translate("MainWindow", "Include separate subtitles", None))
@@ -248,44 +241,85 @@ class Ui_MainWindow(object):
 
     def open(self):
         folder = QtGui.QFileDialog.getExistingDirectory(MainWindow, "Choose folder", QtCore.QDir.currentPath())
-        global anime, converter
+        global anime
         anime = Anime(folder)
-        converter = Converter()
         self.pathLabel.setText(folder)
         self.numLabel.setText(str(anime.n()))
         self.start.setMaximum(anime.n())
         self.end.setMaximum(anime.n())
+        self.converter = Converter(self)
+        self.convertBox.setChecked(False)
+        self.audioBox.setChecked(False)
+        self.subBox.setChecked(False)
+        self.runButton.setDisabled(True)
 
     def set_convert(self, need):
-        converter.need_convert = need
+        self.converter.need_convert = need
+        self.runButton.setEnabled(need)
 
     def set_audio(self, need):
         if need:
             folder = QtGui.QFileDialog.getExistingDirectory(MainWindow, "Choose folder", anime.folder)
             if folder != '':
-                converter.audio = [True, folder, '']
-                print(converter.audio)
+                self.converter.audio = [True, folder, '']
+                print(self.converter.audio)
             else:
                 print('No folder!')
                 self.audioBox.setChecked(False)
         else:
-            converter.audio = [False, '', '']
+            self.converter.audio = [False, '', '']
+        self.runButton.setEnabled(need)
 
     def set_subs(self, need):
         if need:
             folder = QtGui.QFileDialog.getExistingDirectory(MainWindow, "Choose folder", anime.folder)
             if folder != '':
-                converter.subs = [True, folder, '']
+                self.converter.subs = [True, folder, '']
             else:
                 print('No folder!')
                 self.subBox.setChecked(False)
         else:
-            converter.subs = [False, '', '']
+            self.converter.subs = [False, '', '']
+        self.runButton.setEnabled(need)
 
     def bake(self):
-        print('Bake!')
-        converter.convert(self.start.value(), self.end.value())
-        print('Done!')
+        self.progressBar.setVisible(True)
+        self.convertBox.setDisabled(True)
+        self.audioBox.setDisabled(True)
+        self.subBox.setDisabled(True)
+        self.resetButton.setDisabled(True)
+        self.runButton.setDisabled(True)
+        self.start.setDisabled(True)
+        self.end.setDisabled(True)
+        self.converter.first = self.start.value()
+        self.converter.last = self.end.value()
+        self.converter.update.connect(self.progress, QtCore.Qt.QueuedConnection)
+        self.converter.finished.connect(self.unlock, QtCore.Qt.QueuedConnection)
+        self.converter.start()
+
+    def progress(self):
+        if self.progressBar.value() == -1:
+            num = str(self.end.value() + 1 - self.start.value())
+            self.progressBar.setFormat('%v/'+num)
+            self.progressBar.setTextVisible(True)
+            self.progressBar.setMaximum(self.end.value())
+            self.progressBar.setValue(0)
+        self.progressBar.setValue(self.progressBar.value()+1)
+
+    def unlock(self):
+        self.convertBox.setDisabled(False)
+        self.audioBox.setDisabled(False)
+        self.subBox.setDisabled(False)
+        self.resetButton.setDisabled(False)
+        self.runButton.setDisabled(False)
+        self.start.setDisabled(False)
+        self.end.setDisabled(False)
+
+    def abort(self):
+        self.convertBox.setChecked(False)
+        self.audioBox.setChecked(False)
+        self.subBox.setChecked(False)
+
 
 if __name__ == "__main__":
     import sys
