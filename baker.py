@@ -81,6 +81,7 @@ class Converter(QtCore.QThread):
             if self.need_convert:
                 self.x264(anime.folder, anime.episode(i-1))
             self.mkvmerge(anime.folder, anime.episode(i-1))
+            os.remove(anime.episode(i-1)+'.x264')
             self.update.emit()
         self.finished.emit()
 
@@ -88,6 +89,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(351, 290)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("icon")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.infoBox = QtGui.QGroupBox(self.centralwidget)
@@ -302,9 +306,11 @@ class Ui_MainWindow(object):
             num = str(self.end.value() + 1 - self.start.value())
             self.progressBar.setFormat('%v/'+num)
             self.progressBar.setTextVisible(True)
-            self.progressBar.setMaximum(self.end.value())
+            self.progressBar.setMaximum(self.end.value()-self.start.value()+1)
+            print('Set bar length to:', self.end.value())
             self.progressBar.setValue(0)
         self.progressBar.setValue(self.progressBar.value()+1)
+        print('Updated bar to:', self.progressBar.value())
 
     def unlock(self):
         self.convertBox.setDisabled(False)
