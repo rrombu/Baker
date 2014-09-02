@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui
+#TODO: from pymediainfo import MediaInfo
 import os
 
 try:
@@ -33,6 +34,16 @@ class Anime():
     def n(self):
         return self.quantity
 
+    ### UNDER CONSTRUCTION ###
+    '''def bit(self):
+        file = self.folder + '\\' + self.episodes[0]
+        print(file)
+        media_info = MediaInfo.parse("D:\\1.mkv", environment=os.environ)
+        for track in media_info.tracks:
+            if track.track_type == 'Video':
+                print('MediaInfo:', track.bit_rate, track.bit_rate_mode, track.codec)'''
+    ###                    ###
+
     def list(self):
         return self.episodes
 
@@ -51,9 +62,10 @@ class Converter(QtCore.QThread):
         self.subs = [False, 'path', 'params']
         self.first = 0
         self.last = 0
+        self.params = '--tune animation --profile high --level 4.2 --crf 17 --fps 23.976 --preset fast'
 
     def x264(self, folder, file):
-        preset = 'x264 --tune animation --profile high --level 4.2 --crf 17 --fps 23.976 --preset fast -o "'
+        preset = 'x264 {} -o "'.format(self.params)
         query = preset + file + '.x264" "' + folder + '\\' + file + '.mkv"'
         print(query)
         os.system(query)
@@ -85,12 +97,62 @@ class Converter(QtCore.QThread):
             self.update.emit()
         self.finished.emit()
 
+class x264_Dialog(object):
+    def setupUi(self, Dialog, value):
+        Dialog.setObjectName(_fromUtf8("Dialog"))
+        Dialog.resize(401, 150)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("baker.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        Dialog.setWindowIcon(icon)
+        self.widget = QtGui.QWidget(Dialog)
+        self.widget.setGeometry(QtCore.QRect(10, 10, 381, 131))
+        self.widget.setObjectName(_fromUtf8("widget"))
+        self.verticalLayout = QtGui.QVBoxLayout(self.widget)
+        self.verticalLayout.setMargin(0)
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.label = QtGui.QLabel(self.widget)
+        self.label.setWordWrap(True)
+        self.label.setObjectName(_fromUtf8("label"))
+        self.verticalLayout.addWidget(self.label)
+        self.label_2 = QtGui.QLabel(self.widget)
+        font = QtGui.QFont()
+        font.setItalic(True)
+        self.label_2.setFont(font)
+        self.label_2.setWordWrap(True)
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.verticalLayout.addWidget(self.label_2)
+        self.lineEdit = QtGui.QLineEdit(self.widget)
+        self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
+        self.lineEdit.setText(value)
+        self.verticalLayout.addWidget(self.lineEdit)
+        self.buttonBox = QtGui.QDialogButtonBox(self.widget)
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+        self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
+        self.verticalLayout.addWidget(self.buttonBox)
+
+        self.retranslateUi(Dialog)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        Dialog.setWindowTitle(_translate("Dialog", "x264 parameters", None))
+        self.label.setText(_translate("Dialog", "Below you can see default x264 conversion parameters used in this "
+                                                "program. You can change them or add new ones.", None))
+        self.label_2.setText(_translate("Dialog", "WARNING! Wrong parameters can break program conversion function!"
+                                                  "Restart program to undo any changes.", None))
+
+    def getValues(self):
+        return str(self.lineEdit.text())
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(351, 290)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8("icon")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("baker.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
@@ -206,10 +268,13 @@ class Ui_MainWindow(object):
         self.actionChoose.setObjectName(_fromUtf8("actionChoose"))
         self.actionCheck = QtGui.QAction(MainWindow)
         self.actionCheck.setObjectName(_fromUtf8("actionCheck"))
+        self.actionX264 = QtGui.QAction(MainWindow, triggered=self.x264DIalog)
+        self.actionX264.setObjectName(_fromUtf8("actionX264"))
         self.actionAbout = QtGui.QAction(MainWindow)
         self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
         self.menu.addAction(self.actionChoose)
         self.menu.addAction(self.actionCheck)
+        self.menu.addAction(self.actionX264)
         self.menu.addAction(self.actionAbout)
         self.menubar.addAction(self.menu.menuAction())
 
@@ -241,12 +306,14 @@ class Ui_MainWindow(object):
         self.menu.setTitle(_translate("MainWindow", "More", None))
         self.actionChoose.setText(_translate("MainWindow", "Choose Anime folder", None))
         self.actionCheck.setText(_translate("MainWindow", "Check tools", None))
+        self.actionX264.setText(_translate("MainWindow", "Converter parameters", None))
         self.actionAbout.setText(_translate("MainWindow", "About", None))
 
     def open(self):
         folder = QtGui.QFileDialog.getExistingDirectory(MainWindow, "Choose folder", QtCore.QDir.currentPath())
         global anime
         anime = Anime(folder)
+        #anime.bit()
         self.pathLabel.setText(folder)
         self.numLabel.setText(str(anime.n()))
         self.start.setMaximum(anime.n())
@@ -325,6 +392,13 @@ class Ui_MainWindow(object):
         self.convertBox.setChecked(False)
         self.audioBox.setChecked(False)
         self.subBox.setChecked(False)
+
+    def x264Dialog(self):
+        Dialog = QtGui.QDialog()
+        dui = x264_Dialog()
+        dui.setupUi(Dialog, self.converter.params)
+        if Dialog.exec_():
+            self.converter.params = dui.getValues()
 
 
 if __name__ == "__main__":
