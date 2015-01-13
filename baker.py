@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui
-#TODO: from pymediainfo import MediaInfo
 import os
 
 try:
@@ -33,16 +32,6 @@ class Anime():
 
     def n(self):
         return self.quantity
-
-    ### UNDER CONSTRUCTION ###
-    '''def bit(self):
-        file = self.folder + '\\' + self.episodes[0]
-        print(file)
-        media_info = MediaInfo.parse("D:\\1.mkv", environment=os.environ)
-        for track in media_info.tracks:
-            if track.track_type == 'Video':
-                print('MediaInfo:', track.bit_rate, track.bit_rate_mode, track.codec)'''
-    ###                    ###
 
     def list(self):
         return self.episodes
@@ -93,7 +82,8 @@ class Converter(QtCore.QThread):
             if self.need_convert:
                 self.x264(anime.folder, anime.episode(i-1))
             self.mkvmerge(anime.folder, anime.episode(i-1))
-            os.remove(anime.episode(i-1)+'.x264')
+            if self.need_convert:
+                os.remove(anime.episode(i-1)+'.x264')
             self.update.emit()
         self.finished.emit()
 
@@ -268,7 +258,7 @@ class Ui_MainWindow(object):
         self.actionChoose.setObjectName(_fromUtf8("actionChoose"))
         self.actionCheck = QtGui.QAction(MainWindow)
         self.actionCheck.setObjectName(_fromUtf8("actionCheck"))
-        self.actionX264 = QtGui.QAction(MainWindow, triggered=self.x264DIalog)
+        self.actionX264 = QtGui.QAction(MainWindow, triggered=self.x264Dialog)
         self.actionX264.setObjectName(_fromUtf8("actionX264"))
         self.actionAbout = QtGui.QAction(MainWindow)
         self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
@@ -295,7 +285,7 @@ class Ui_MainWindow(object):
         self.label_6.setText(_translate("MainWindow", "Number of episodes found:", None))
         self.numLabel.setText(_translate("MainWindow", "-", None))
         self.label_8.setText(_translate("MainWindow", "Bit depth:", None))
-        self.bitLabel.setText(_translate("MainWindow", "-", None))
+        self.bitLabel.setText(_translate("MainWindow", "NIY", None))
         self.runButton.setText(_translate("MainWindow", "Bake!", None))
         self.resetButton.setText(_translate("MainWindow", "Reset", None))
         self.convertBox.setText(_translate("MainWindow", "Convert 10bit -> 8 bit", None))
@@ -313,7 +303,6 @@ class Ui_MainWindow(object):
         folder = QtGui.QFileDialog.getExistingDirectory(MainWindow, "Choose folder", QtCore.QDir.currentPath())
         global anime
         anime = Anime(folder)
-        #anime.bit()
         self.pathLabel.setText(folder)
         self.numLabel.setText(str(anime.n()))
         self.start.setMaximum(anime.n())
