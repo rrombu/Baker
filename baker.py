@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui
 import os
+import subprocess
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -57,7 +58,7 @@ class Converter(QtCore.QThread):
         preset = 'x264 {} -o "'.format(self.params)
         query = preset + file + '.x264" "' + folder + '\\' + file + '.mkv"'
         print(query)
-        os.system(query)
+        subprocess.call(query, shell=True)
 
     def mkvmerge(self, folder, file):
         if not os.path.exists(folder + '\\8bit'):
@@ -75,7 +76,7 @@ class Converter(QtCore.QThread):
         if self.subs[0]:
             query += s
         print(query)
-        os.system(query)
+        subprocess.call(query, shell=True)
 
     def run(self):
         for i in range(self.first, self.last+1):
@@ -199,8 +200,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.progressBar = QtGui.QProgressBar(self.layoutWidget1)
         self.progressBar.setAutoFillBackground(False)
-        self.progressBar.setMaximum(0)
-        self.progressBar.setTextVisible(False)
         self.progressBar.setObjectName(_fromUtf8("progressBar"))
         self.progressBar.setVisible(False)
         self.verticalLayout_3.addWidget(self.progressBar)
@@ -308,6 +307,7 @@ class Ui_MainWindow(object):
         self.start.setMaximum(anime.n())
         self.end.setMaximum(anime.n())
         self.converter = Converter(self)
+        self.converter.update.connect(self.progress, QtCore.Qt.QueuedConnection)
         self.convertBox.setChecked(False)
         self.audioBox.setChecked(False)
         self.subBox.setChecked(False)
@@ -343,6 +343,9 @@ class Ui_MainWindow(object):
         self.runButton.setEnabled(need)
 
     def bake(self):
+        self.progressBar.setMaximum(0)
+        self.progressBar.setValue(-1)
+        self.progressBar.setTextVisible(False)
         self.progressBar.setVisible(True)
         self.convertBox.setDisabled(True)
         self.audioBox.setDisabled(True)
@@ -353,7 +356,6 @@ class Ui_MainWindow(object):
         self.end.setDisabled(True)
         self.converter.first = self.start.value()
         self.converter.last = self.end.value()
-        self.converter.update.connect(self.progress, QtCore.Qt.QueuedConnection)
         self.converter.finished.connect(self.unlock, QtCore.Qt.QueuedConnection)
         self.converter.start()
 
