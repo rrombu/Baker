@@ -2,6 +2,7 @@
 from PyQt4 import QtCore, QtGui
 import os
 import subprocess
+import atexit
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -61,13 +62,19 @@ class Converter(QtCore.QThread):
         subprocess.call(query, shell=True)
 
     def mkvmerge(self, folder, file):
-        if not os.path.exists(folder + '\\8bit'):
-            os.makedirs(folder + '\\8bit')
+        if not os.path.exists(folder + '\\Baked'):
+            os.makedirs(folder + '\\Baked')
         v = '"' + folder + '\\' + file + '.mkv" '
         v8 = '"' + file + '.x264" '
         a = '--forced-track "0:yes" --default-track "0:yes" "' + self.audio[1] + '\\' + file + '.mka" '
-        s = '--forced-track "0:yes" --default-track "0:yes" "' + self.subs[1] + '\\' + file + '.ass" '
-        query = 'mkvmerge -o "' + folder + '\\8bit\\' + file + '.mkv" '
+        if os.path.exists('{}\\{}.ass'.format(self.subs[1], file)):
+            s = '--forced-track "0:yes" --default-track "0:yes" "' + self.subs[1] + '\\' + file + '.ass" '
+        elif os.path.exists('{}\\{}.надписи.ass'.format(self.subs[1], file)):
+            s = '--forced-track "0:yes" --default-track "0:yes" "' + self.subs[1] + '\\' + file + '.надписи.ass" '
+        else:
+            print('Sub file error!')
+            s = ''
+        query = 'mkvmerge -o "' + folder + '\\Baked\\' + file + '.mkv" '
         if self.need_convert:
             query += (v8 + '-D ')
         query += v
