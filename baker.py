@@ -2,7 +2,6 @@
 from PyQt4 import QtCore, QtGui
 import os
 import subprocess
-import atexit
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -262,14 +261,11 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionChoose = QtGui.QAction(MainWindow, triggered=self.open)
         self.actionChoose.setObjectName(_fromUtf8("actionChoose"))
-        self.actionCheck = QtGui.QAction(MainWindow)
-        self.actionCheck.setObjectName(_fromUtf8("actionCheck"))
         self.actionX264 = QtGui.QAction(MainWindow, triggered=self.x264Dialog)
         self.actionX264.setObjectName(_fromUtf8("actionX264"))
         self.actionAbout = QtGui.QAction(MainWindow)
         self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
         self.menu.addAction(self.actionChoose)
-        self.menu.addAction(self.actionCheck)
         self.menu.addAction(self.actionX264)
         self.menu.addAction(self.actionAbout)
         self.menubar.addAction(self.menu.menuAction())
@@ -301,7 +297,6 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "to", None))
         self.menu.setTitle(_translate("MainWindow", "More", None))
         self.actionChoose.setText(_translate("MainWindow", "Choose Anime folder", None))
-        self.actionCheck.setText(_translate("MainWindow", "Check tools", None))
         self.actionX264.setText(_translate("MainWindow", "Converter parameters", None))
         self.actionAbout.setText(_translate("MainWindow", "About", None))
 
@@ -319,6 +314,26 @@ class Ui_MainWindow(object):
         self.audioBox.setChecked(False)
         self.subBox.setChecked(False)
         self.runButton.setDisabled(True)
+
+    def checksoft(self):
+        import urllib.request
+        splash_pix = QtGui.QPixmap(QtCore.QSize(400, 100))
+        painter = QtGui.QPainter(splash_pix)
+        painter.fillRect(QtCore.QRectF(0, 0, 400, 400), QtGui.QBrush(QtGui.QColor(66, 161, 239)))
+        painter.end()
+        splash = QtGui.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
+        splash.setMask(splash_pix.mask())
+        splash.showMessage("Downloading x264 and Mkvmerge. It shouldn't take long...", QtCore.Qt.AlignCenter)
+        if not os.path.exists('x264.exe'):
+            splash.show()
+            urllib.request.urlretrieve("http://download.videolan.org/pub/videolan/x264/binaries/win32/x264-r2491-24e4fed.exe",
+                                       "x264.exe")
+        if not os.path.exists('mkvmerge.exe'):
+            splash.show()
+            urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=0BzO4LREgLV3SOXlHT04zVW5HTW8",
+                                       "mkvmerge.exe")
+        splash.finish(None)
+
 
     def set_convert(self, need):
         self.converter.need_convert = need
@@ -405,6 +420,7 @@ if __name__ == "__main__":
     MainWindow = QtGui.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+    ui.checksoft()
     ui.open()
     MainWindow.show()
     sys.exit(app.exec_())
