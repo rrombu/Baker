@@ -3,6 +3,11 @@ from PyQt4 import QtCore, QtGui
 import os
 import subprocess
 
+dir_path = '{}\\BakeMyAnime'.format(os.environ['APPDATA'])
+if not os.path.exists(dir_path):
+    os.makedirs(dir_path)
+os.chdir(dir_path)
+
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -45,6 +50,7 @@ class Anime():
 class Converter(QtCore.QThread):
     update = QtCore.pyqtSignal()
     finished = QtCore.pyqtSignal()
+
     def __init__(self, mw):
         super(Converter, self).__init__()
         self.need_convert = False
@@ -93,6 +99,7 @@ class Converter(QtCore.QThread):
                 os.remove(anime.episode(i-1)+'.x264')
             self.update.emit()
         self.finished.emit()
+
 
 class x264_Dialog(object):
     def setupUi(self, Dialog, value):
@@ -308,6 +315,7 @@ class Ui_MainWindow(object):
         self.numLabel.setText(str(anime.n()))
         self.start.setMaximum(anime.n())
         self.end.setMaximum(anime.n())
+        self.end.setValue(anime.n())
         self.converter = Converter(self)
         self.converter.update.connect(self.progress, QtCore.Qt.QueuedConnection)
         self.convertBox.setChecked(False)
@@ -334,7 +342,6 @@ class Ui_MainWindow(object):
                                        "mkvmerge.exe")
         splash.finish(None)
 
-
     def set_convert(self, need):
         self.converter.need_convert = need
         self.runButton.setEnabled(need)
@@ -344,7 +351,14 @@ class Ui_MainWindow(object):
             folder = QtGui.QFileDialog.getExistingDirectory(MainWindow, "Choose folder", anime.folder)
             if folder != '':
                 self.converter.audio = [True, folder, '']
-                print(self.converter.audio)
+                l = 0
+                for name in os.listdir(folder):
+                    if os.path.isfile(os.path.join(folder, name)):
+                        l += 1
+                if l != anime.n():
+                    QtGui.QMessageBox.warning(MainWindow, 'Warning', 'Number of audio-tracks is not equal to number of '
+                                                                     'episodes! Some results may become missing.',
+                                              QtGui.QMessageBox.Ok)
             else:
                 print('No folder!')
                 self.audioBox.setChecked(False)
@@ -357,6 +371,14 @@ class Ui_MainWindow(object):
             folder = QtGui.QFileDialog.getExistingDirectory(MainWindow, "Choose folder", anime.folder)
             if folder != '':
                 self.converter.subs = [True, folder, '']
+                l = 0
+                for name in os.listdir(folder):
+                    if os.path.isfile(os.path.join(folder, name)):
+                        l += 1
+                if l != anime.n():
+                    QtGui.QMessageBox.warning(MainWindow, 'Warning', 'Number of subtitles is not equal to number of '
+                                                                     'episodes! Some results may become missing.',
+                                              QtGui.QMessageBox.Ok)
             else:
                 print('No folder!')
                 self.subBox.setChecked(False)
@@ -383,8 +405,7 @@ class Ui_MainWindow(object):
 
     def progress(self):
         if self.progressBar.value() == -1:
-            num = str(self.end.value() + 1 - self.start.value())
-            self.progressBar.setFormat('%v/'+num)
+            self.progressBar.setFormat('%v/{}'.format(self.end.value() + 1 - self.start.value()))
             self.progressBar.setTextVisible(True)
             self.progressBar.setMaximum(self.end.value()-self.start.value()+1)
             print('Set bar length to:', self.end.value())
@@ -398,7 +419,9 @@ class Ui_MainWindow(object):
         self.subBox.setDisabled(False)
         self.resetButton.setDisabled(False)
         self.runButton.setDisabled(False)
+        self.start.setValue(self.end.value())
         self.start.setDisabled(False)
+        self.end.setValue(anime.n())
         self.end.setDisabled(False)
 
     def abort(self):
