@@ -3,7 +3,7 @@ from PyQt4 import QtCore, QtGui
 import os
 import subprocess
 
-dir_path = '{}\\BakeMyAnime'.format(os.environ['APPDATA'])
+dir_path = '{}\\Baker'.format(os.environ['APPDATA'])
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 os.chdir(dir_path)
@@ -35,6 +35,11 @@ class Anime():
                 self.episodes.append(item)
         self.episodes.sort()
         self.quantity = len(self.episodes)
+        print('ffprobe.exe -hide_banner -show_streams -select_streams v "{}\\{}.mkv" | find "bits" '.format(self.folder, self.episode(0)))
+        probe = subprocess.Popen('ffprobe.exe -show_streams -select_streams v '
+                                 '"{}\\{}.mkv"'.format(self.folder, self.episode(0)), stdout=subprocess.PIPE)
+        self.bit_depth = subprocess.Popen('find "bits"', stdin=probe.stdout, stdout=subprocess.PIPE).stdout.read()\
+            .decode('utf-8').strip("\r\n").split('=')[-1]
 
     def n(self):
         return self.quantity
@@ -293,8 +298,8 @@ class Ui_MainWindow(object):
         self.pathLabel.setText(_translate("MainWindow", "-", None))
         self.label_6.setText(_translate("MainWindow", "Number of episodes found:", None))
         self.numLabel.setText(_translate("MainWindow", "-", None))
-        self.label_8.setText(_translate("MainWindow", "Bit depth:", None))
-        self.bitLabel.setText(_translate("MainWindow", "NIY", None))
+        self.label_8.setText(_translate("MainWindow", "Pixel color depth:", None))
+        self.bitLabel.setText(_translate("MainWindow", "-", None))
         self.runButton.setText(_translate("MainWindow", "Bake!", None))
         self.resetButton.setText(_translate("MainWindow", "Reset", None))
         self.convertBox.setText(_translate("MainWindow", "Convert 10bit -> 8 bit", None))
@@ -313,6 +318,7 @@ class Ui_MainWindow(object):
         anime = Anime(folder)
         self.pathLabel.setText(folder)
         self.numLabel.setText(str(anime.n()))
+        self.bitLabel.setText("{}bit".format(anime.bit_depth))
         self.start.setMaximum(anime.n())
         self.end.setMaximum(anime.n())
         self.end.setValue(anime.n())
@@ -333,13 +339,27 @@ class Ui_MainWindow(object):
         splash.setMask(splash_pix.mask())
         splash.showMessage("Downloading x264 and Mkvmerge. It shouldn't take long...", QtCore.Qt.AlignCenter)
         if not os.path.exists('x264.exe'):
+            splash.showMessage("Downloading x264...", QtCore.Qt.AlignCenter)
             splash.show()
-            urllib.request.urlretrieve("http://download.videolan.org/pub/videolan/x264/binaries/win32/x264-r2491-24e4fed.exe",
+            urllib.request.urlretrieve("http://download.videolan.org/pub/videolan/x264/binaries/win32/"
+                                       "x264-r2491-24e4fed.exe",
                                        "x264.exe")
         if not os.path.exists('mkvmerge.exe'):
+            splash.showMessage("Downloading Mkvmerge...", QtCore.Qt.AlignCenter)
             splash.show()
             urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=0BzO4LREgLV3SOXlHT04zVW5HTW8",
                                        "mkvmerge.exe")
+        if not os.path.exists('ffprobe.exe'):
+            splash.showMessage("Downloading Ffprobe...", QtCore.Qt.AlignCenter)
+            splash.show()
+            url = "https://s50f.storage.yandex.net/rdisk/a3a8bf55ca3034bfc8781d85e09e24b2a9d30f67fa77e964903b98aebdfe" \
+                  "b954/56d10219/xY_VFUGd3YkP8UXbndAh4QU7eUEGjxJ69F1eMLtmwrOwsC8PZy-b_qCwpBVDIDCM2C2WshhqTTqAdR0sIPhc" \
+                  "-w%3D%3D?uid=0&filename=ffprobe.exe&disposition=attachment&hash=%2FxPuSswQShV5fSEfY%2B9nVeMTaZlMzR" \
+                  "BywaH5VlRPhK0%3D&limit=0&content_type=application%2Fx-msdownload&fsize=43058688&hid=e0a1637ce283c8" \
+                  "bf94a23597d8abf6ac&media_type=executable&tknv=v2&rtoken=GsClbROJiQ42&force_default=no&ycrid=na-d09" \
+                  "53224f5610d1a05a055d3d38479e5-downloader13g&ts=52cb6b641f840&s=986d26d14ba1e68c5baecf88b1d06051206" \
+                  "b6b5343d0f69a3723c702fc660266&bp=/19/4/data-0.15:30201574567:43058688"
+            urllib.request.urlretrieve(url, "ffprobe.exe")
         splash.finish(None)
 
     def set_convert(self, need):
