@@ -1,6 +1,8 @@
 BakeMyAnime
 ===========
 
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+
 ### Functions
 * convert 10-bit titles into 8-bit;
 * repack mkv files with subtitles and audio of your choice.

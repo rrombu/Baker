@@ -35,10 +35,13 @@ class Anime():
                 self.episodes.append(item)
         self.episodes.sort()
         self.quantity = len(self.episodes)
-        print('ffprobe.exe -hide_banner -show_streams -select_streams v "{}\\{}.mkv" | find "bits" '.format(self.folder, self.episode(0)))
-        probe = subprocess.Popen('ffprobe.exe -show_streams -select_streams v '
-                                 '"{}\\{}.mkv"'.format(self.folder, self.episode(0)), stdout=subprocess.PIPE)
-        self.bit_depth = subprocess.Popen('find "bits"', stdin=probe.stdout, stdout=subprocess.PIPE).stdout.read()\
+        startupinfo = subprocess.STARTUPINFO()  # Hide separate window
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        probe = subprocess.Popen('ffprobe.exe -hide_banner -show_streams -select_streams v '
+                                 '"{}\\{}.mkv"'.format(self.folder, self.episode(0)),
+                                 stdout=subprocess.PIPE, startupinfo=startupinfo)
+        self.bit_depth = subprocess.Popen('find "bits"', stdin=probe.stdout, stdout=subprocess.PIPE,
+                                          startupinfo=startupinfo).stdout.read()\
             .decode('utf-8').strip("\r\n").split('=')[-1]
 
     def n(self):
@@ -64,12 +67,15 @@ class Converter(QtCore.QThread):
         self.first = 0
         self.last = 0
         self.params = '--tune animation --profile high --level 4.2 --crf 17 --fps 23.976 --preset fast'
+        self.verbose = False
 
     def x264(self, folder, file):
         preset = 'x264 {} -o "'.format(self.params)
         query = preset + file + '.x264" "' + folder + '\\' + file + '.mkv"'
-        print(query)
-        subprocess.call(query, shell=True)
+        if self.verbose:
+            subprocess.call(query, shell=True, creationflags=0x08000000)
+        else:
+            subprocess.call(query, shell=True)
 
     def mkvmerge(self, folder, file):
         if not os.path.exists(folder + '\\Baked'):
@@ -92,8 +98,10 @@ class Converter(QtCore.QThread):
             query += a
         if self.subs[0]:
             query += s
-        print(query)
-        subprocess.call(query, shell=True)
+        if self.verbose:
+            subprocess.call(query, shell=True, creationflags=0x08000000)
+        else:
+            subprocess.call(query, shell=True)
 
     def run(self):
         for i in range(self.first, self.last+1):
