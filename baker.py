@@ -331,35 +331,35 @@ class Ui_MainWindow(object):
 
     def checksoft(self):
         import urllib.request
-        splash_pix = QtGui.QPixmap(QtCore.QSize(400, 100))
-        painter = QtGui.QPainter(splash_pix)
-        painter.fillRect(QtCore.QRectF(0, 0, 400, 400), QtGui.QBrush(QtGui.QColor(66, 161, 239)))
-        painter.end()
+
+        if not os.path.exists('splash'):
+            urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=0BzO4LREgLV3SaVNiYlhseFlLM1k",
+                                       "splash")
+        splash_pix = QtGui.QPixmap("{}\\splash".format(dir_path))
         splash = QtGui.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
-        splash.setMask(splash_pix.mask())
-        splash.showMessage("Downloading x264 and Mkvmerge. It shouldn't take long...", QtCore.Qt.AlignCenter)
-        if not os.path.exists('x264.exe'):
-            splash.showMessage("Downloading x264...", QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("Calibri"))
+        font.setBold(True)
+        font.setPointSize(10)
+        splash.setFont(font)
+        splash.showMessage("{}Starting...".format('\n'*11),
+                           QtCore.Qt.AlignAbsolute, QtCore.Qt.white)
+        splash.show()
+        if not (os.path.exists('ffprobe.exe') or os.path.exists('mkvmerge.exe') or os.path.exists('x264.exe')):
+            splash.showMessage("{}Downloading necessary tools...".format('\n'*11),
+                               QtCore.Qt.AlignAbsolute, QtCore.Qt.white)
             splash.show()
-            urllib.request.urlretrieve("http://download.videolan.org/pub/videolan/x264/binaries/win32/"
-                                       "x264-r2491-24e4fed.exe",
-                                       "x264.exe")
-        if not os.path.exists('mkvmerge.exe'):
-            splash.showMessage("Downloading Mkvmerge...", QtCore.Qt.AlignCenter)
-            splash.show()
-            urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=0BzO4LREgLV3SOXlHT04zVW5HTW8",
-                                       "mkvmerge.exe")
-        if not os.path.exists('ffprobe.exe'):
-            splash.showMessage("Downloading Ffprobe...", QtCore.Qt.AlignCenter)
-            splash.show()
-            url = "https://s50f.storage.yandex.net/rdisk/a3a8bf55ca3034bfc8781d85e09e24b2a9d30f67fa77e964903b98aebdfe" \
-                  "b954/56d10219/xY_VFUGd3YkP8UXbndAh4QU7eUEGjxJ69F1eMLtmwrOwsC8PZy-b_qCwpBVDIDCM2C2WshhqTTqAdR0sIPhc" \
-                  "-w%3D%3D?uid=0&filename=ffprobe.exe&disposition=attachment&hash=%2FxPuSswQShV5fSEfY%2B9nVeMTaZlMzR" \
-                  "BywaH5VlRPhK0%3D&limit=0&content_type=application%2Fx-msdownload&fsize=43058688&hid=e0a1637ce283c8" \
-                  "bf94a23597d8abf6ac&media_type=executable&tknv=v2&rtoken=GsClbROJiQ42&force_default=no&ycrid=na-d09" \
-                  "53224f5610d1a05a055d3d38479e5-downloader13g&ts=52cb6b641f840&s=986d26d14ba1e68c5baecf88b1d06051206" \
-                  "b6b5343d0f69a3723c702fc660266&bp=/19/4/data-0.15:30201574567:43058688"
-            urllib.request.urlretrieve(url, "ffprobe.exe")
+            urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=0BzO4LREgLV3SUW5NbkNYYUIzb2M",
+                                       "baker_tools.zip")
+            from zipfile import ZipFile
+            with ZipFile('baker_tools.zip', "r") as z:
+                z.extractall()
+            os.remove("baker_tools.zip")
+        else:
+            splash.showMessage("{}Welcome to bakery!".format('\n'*11),
+                               QtCore.Qt.AlignAbsolute, QtCore.Qt.white)
+            import time
+            time.sleep(1)
         splash.finish(None)
 
     def set_convert(self, need):
