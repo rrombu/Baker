@@ -10,7 +10,7 @@ setup(
     options={'py2exe': {'includes': ['sip', 'PyQt4.QtCore', 'PyQt4.QtGui'],
                         'bundle_files': 1, 'compressed': True}},
     name='Baker',
-    version='1.0',
+    version='0.9.1',
     packages=[''],
     url='',
     license='',
