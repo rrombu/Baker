@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import pyqtSignal, QThread
+from PyQt4.QtCore import QThread
 import os
 import subprocess
 import probe
 
-dir_path = '{}\\Baker'.format(os.environ['APPDATA'])
-if not os.path.exists(dir_path):
-    os.makedirs(dir_path)
-os.chdir(dir_path)
 
 class Converter(QThread):
-    update = pyqtSignal(list)
-    finished = pyqtSignal()
+    if __name__ != "__main__":
+        from PyQt4.QtCore import pyqtSignal
+        from PyQt4.QtCore import QThread
+        update = pyqtSignal(list)
+        finished = pyqtSignal()
 
-    def __init__(self, mw, anime):
-        super(Converter, self).__init__()
+    def __init__(self, anime):
+        if __name__ != "__main__":
+            super(Converter, self).__init__()
         self.need_convert = False
         self.audio = [False, 'path', 'params']
         self.subs = [False, 'path', 'params']
@@ -81,17 +81,8 @@ class Converter(QThread):
         self.update.emit([None, 100])
         self.finished.emit()
 
-
 if __name__ == "__main__":
-    import sys
-    from gui import Ui_MainWindow
-    from PyQt4 import QtGui
-    app = QtGui.QApplication(sys.argv)
-    app.setStyle(QtGui.QStyleFactory.create("plastique"))
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    ui.checksoft(dir_path)
-    ui.open()
-    MainWindow.show()
-    sys.exit(app.exec_())
+    from title import Anime
+    path = ''
+    anime = Anime(path)
+    converter = Converter(None, anime)

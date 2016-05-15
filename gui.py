@@ -274,7 +274,7 @@ class Ui_MainWindow(object):
         self.startBox.setValue(1)
         self.endBox.setMaximum(anime.n())
         self.endBox.setValue(anime.n())
-        self.converter = Converter(self, anime)
+        self.converter = Converter(anime)
         self.converter.update.connect(self.progress, QtCore.Qt.QueuedConnection)
         self.convertVideoCheck.setChecked(False)
         self.audioCheck.setChecked(False)
@@ -321,50 +321,28 @@ class Ui_MainWindow(object):
         self.bakeButton.setEnabled(need)
 
     def set_audio(self, need):
-        from os import path, listdir
-
         if need:
-            folder = QtGui.QFileDialog.getExistingDirectory(None, "Choose folder", anime.folder)
-            if folder != '':
-                self.converter.audio = [True, folder, '']
-                l = 0
-                for name in listdir(folder):
-                    if path.isfile(path.join(folder, name)):
-                        l += 1
-                if l != anime.n():
-                    QtGui.QMessageBox.warning(None, 'Warning', 'Number of audio-tracks is not equal to number of '
-                                                                     'episodes! Some results may become missing.',
-                                              QtGui.QMessageBox.Ok)
-            else:
-                print('No folder!')
-                self.audioCheck.setChecked(False)
+            self.audioBox.show()
+            self.audioBox.addItems(list(anime.audio.keys()))
         else:
+            self.audioBox.hide()
+            self.audioBox.clear()
             self.converter.audio = [False, '', '']
         self.bakeButton.setEnabled(need)
 
     def set_subs(self, need):
-        from os import path, listdir
-
         if need:
-            folder = QtGui.QFileDialog.getExistingDirectory(None, "Choose folder", anime.folder)
-            if folder != '':
-                self.converter.subs = [True, folder, '']
-                l = 0
-                for name in listdir(folder):
-                    if path.isfile(path.join(folder, name)):
-                        l += 1
-                if l != anime.n():
-                    QtGui.QMessageBox.warning(None, 'Warning', 'Number of subtitles is not equal to number of '
-                                                                     'episodes! Some results may become missing.',
-                                              QtGui.QMessageBox.Ok)
-            else:
-                print('No folder!')
-                self.subCheck.setChecked(False)
+            self.subBox.show()
+            self.subBox.addItems(list(anime.subtitles.keys()))
         else:
+            self.subBox.hide()
+            self.subBox.clear()
             self.converter.subs = [False, '', '']
         self.bakeButton.setEnabled(need)
 
     def bake(self):
+        self.converter.audio = [True, anime.audio[self.audioBox.currentText()]["path"], '']
+        self.converter.subs = [True, anime.subtitles[self.subBox.currentText()]["path"], '']
         self.totalProgressBar.setMaximum(0)
         self.totalProgressBar.setValue(-1)
         self.totalProgressBar.setTextVisible(False)
