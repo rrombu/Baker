@@ -12,7 +12,7 @@ class Anime():
 
         tree = walk(path)
         for dir in tree:
-            if not dir[2] and dir[0] != path: # Only endpoint and root folder
+            if (not dir[2] and dir[0] != path) or dir[0] == "{}\\Baked".format(path): # Only endpoint and root folder
                 continue
             dir[2].sort()
             if any(entry for tag in ["mkv", "mp4", "m4v", "avi"] for entry in dir[2] if tag in entry):

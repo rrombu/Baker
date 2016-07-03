@@ -10,7 +10,7 @@ author_email = ''
 description = 'Anime convert and repack tool'
 
 setup(
-    windows=['main.py'],
+    windows=[{"script":'main.py', "dest_base":"baker"}],
     zipfile=None,
     options={'py2exe': {'includes': ['sip', 'PyQt4.QtCore', 'PyQt4.QtGui'],
                         'bundle_files': 1, 'compressed': True}},

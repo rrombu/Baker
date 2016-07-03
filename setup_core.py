@@ -10,7 +10,7 @@ author_email = ''
 description = 'Anime convert and repack tool'
 
 setup(
-    console=['baker.py'],
+    console=[{"script":'baker.py', "dest_base":"baker_core"}],
     zipfile=None,
     options={'py2exe': {'includes': [],
                         'bundle_files': 1, 'compressed': True}},
