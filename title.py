@@ -26,7 +26,8 @@ class Anime():
             if any(entry for tag in ["ttf", "otf"] for entry in dir[2] if tag in entry):
                 self.fonts[dir[0]] = dir[2]
         self.quantity = len(self.episodes)
-        self.bit_depth = bit_depth('"{}\\{}"'.format(self.folder, self.episodes[0]))
+        self.bit_depth = bit_depth('{}\\{}'.format(self.folder, self.episodes[0]))
+        self.v_ext = self.episodes[0][-3:]
 
     def n(self):
         return self.quantity

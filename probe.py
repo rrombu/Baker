@@ -4,7 +4,7 @@ def probe(entry, file):
     startupinfo = STARTUPINFO()  # Hide separate window
     startupinfo.dwFlags |= STARTF_USESHOWWINDOW
     request = u'ffprobe.exe -v error -select_streams v -show_entries {} ' \
-              u'-of default=noprint_wrappers=1:nokey=1 {}'.format(entry, file)
+              u'-of default=noprint_wrappers=1:nokey=1 "{}"'.format(entry, file)
     return Popen(request, stdout=PIPE, stderr=PIPE, startupinfo=startupinfo).stdout.read().decode('utf-8').strip("\r\n")
 
 def bit_depth(file):

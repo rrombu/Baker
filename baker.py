@@ -16,8 +16,8 @@ class Converter(QThread):
         if __name__ != "__main__":
             super(Converter, self).__init__()
         self.need_convert = False
-        self.audio = [False, 'path', 'params']
-        self.subs = [False, 'path', 'params']
+        self.audio = [False, 'path', 'items']
+        self.subs = [False, 'path', 'items']
         self.first = 0
         self.last = 0
         self.params = '--preset slower --tune animation --profile high --level 4.2 --crf 17 --fps 23.976'
@@ -26,13 +26,16 @@ class Converter(QThread):
         self.anime = anime
 
     def x264(self, folder, file, extension):
+        import atexit
+
         preset = 'x264 --verbose {} -o "'.format(self.params)
         query = '{}{}.x264" "{}\\{}.{}"'.format(preset, file, folder, file, extension)
-        print(query)
+        print("Query: {}".format(query))
         frames_to_decode = probe.frames_total("{}\\{}.{}".format(folder, file, extension))
-        print('Total frames to decode: {}'.format(frames_to_decode))
         x = subprocess.Popen(query, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        while x.poll() is None:
+        atexit.register(x.kill)
+        while x.returncode is None:
+            x.poll()
             line = x.stderr.readline()
             try:
                 frame = line.decode().split('frame=')[-1].split()[0]
@@ -41,8 +44,14 @@ class Converter(QThread):
                 continue
             progress = int(int(frame)/frames_to_decode*100)
             self.update.emit([None, progress])
+        if x.returncode != 0:
+            print("Error: x264 exited with code {}!".format(x.returncode))
+            exit(1)
+        atexit.unregister(x.kill)
 
-    def mkvmerge(self, folder, file):
+
+    def mkvmerge(self, folder, file, fonts):
+        print("Merging:\n\tFolder: {}\n\tFile: {}\n".format(folder, file))
         if not os.path.exists(folder + '\\Baked'):
             os.makedirs(folder + '\\Baked')
         v = '"' + folder + '\\' + file + '.mkv" '
@@ -61,19 +70,30 @@ class Converter(QThread):
         query += v
         if self.audio[0]:
             query += a
+            print("A: {}".format(a))
         if self.subs[0]:
             query += s
+            print("S: {}".format(s))
+            if fonts:
+                for folder in fonts:
+                    for font in fonts[folder]:
+                        query += '--attachment-mime-type application/octet-stream ' \
+                                 '--attach-file "{}\{}" '.format(folder, font)
+        print("Query: {}".format(query))
         if self.verbose:
-            subprocess.call(query, shell=True, creationflags=0x08000000)
+            ret = subprocess.call(query, shell=True, creationflags=0x08000000)
         else:
-            subprocess.call(query, shell=True)
+            ret = subprocess.call(query, shell=True)
+        if ret != 0:
+            print("Error: mkvmerge exited with code {}!".format(ret))
+            exit(1)
 
     def run(self):
         self.progress_counter = 0
         for i in range(self.first, self.last+1):
             if self.need_convert:
                 self.x264(self.anime.folder, self.anime.episode(i-1), self.anime.v_ext)
-            self.mkvmerge(self.anime.folder, self.anime.episode(i-1))
+            self.mkvmerge(self.anime.folder, self.anime.episode(i-1), self.anime.fonts)
             if self.need_convert:
                 os.remove(self.anime.episode(i-1)+'.x264')
             self.progress_counter += 1

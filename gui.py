@@ -341,8 +341,14 @@ class Ui_MainWindow(object):
         self.bakeButton.setEnabled(need)
 
     def bake(self):
-        self.converter.audio = [True, anime.audio[self.audioBox.currentText()]["path"], '']
-        self.converter.subs = [True, anime.subtitles[self.subBox.currentText()]["path"], '']
+        if self.audioBox.currentText() != '':
+            self.converter.audio = [True,
+                                    anime.audio[self.audioBox.currentText()]["path"],
+                                    anime.audio[self.audioBox.currentText()]["items"]]
+        if self.subBox.currentText() != '':
+            self.converter.subs = [True,
+                                   anime.subtitles[self.subBox.currentText()]["path"],
+                                   anime.subtitles[self.subBox.currentText()]["items"]]
         self.totalProgressBar.setMaximum(0)
         self.totalProgressBar.setValue(-1)
         self.totalProgressBar.setTextVisible(False)
