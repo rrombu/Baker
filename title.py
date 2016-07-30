@@ -1,6 +1,6 @@
 class Anime():
     def __init__(self, path):
-        from os import listdir, walk
+        from os import walk
         from probe import bit_depth
 
         self.folder = path

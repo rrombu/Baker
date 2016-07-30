@@ -179,7 +179,6 @@ if __name__ == "__main__":
     P - performance mode (lightweight or ultrafast)
     c - file needs Conversion
     v - verbose output
-    l - lightweight conversion
     '''
     for opt, arg in opts:
         if opt == "-p":   path = arg
