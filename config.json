@@ -1,0 +1,20 @@
+{
+  "tools_location": "%appdata%\\Baker",
+  "x264": {
+    "preset": "slower",
+    "tune": "animation",
+    "profile": "high",
+    "level": 4.2,
+    "crf": 17,
+    "fps": 23.976
+  },
+  "x264light": {
+    "threads": 1,
+    "preset": "fastest",
+    "tune": "animation",
+    "profile": "high",
+    "level": 4.2,
+    "crf": 17,
+    "fps": 23.976
+  }
+}

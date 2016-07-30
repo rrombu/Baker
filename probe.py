@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 def probe(entry, file):
     from subprocess import Popen, STARTUPINFO, STARTF_USESHOWWINDOW, PIPE
+
     startupinfo = STARTUPINFO()  # Hide separate window
     startupinfo.dwFlags |= STARTF_USESHOWWINDOW
-    request = u'ffprobe.exe -v error -select_streams v -show_entries {} ' \
+    request = u'C:\\Users\\Roman\\AppData\\Roaming\\Baker\\ffprobe.exe -v error -select_streams v -show_entries {} ' \
               u'-of default=noprint_wrappers=1:nokey=1 "{}"'.format(entry, file)
+    print("[ffprobe] Executing: {}".format(request))
     return Popen(request, stdout=PIPE, stderr=PIPE, startupinfo=startupinfo).stdout.read().decode('utf-8').strip("\r\n")
+    print("[ffprobe] Information obtained.")
 
 def bit_depth(file):
     return probe('stream=bits_per_raw_sample', file)

@@ -12,7 +12,7 @@ description = 'Anime convert and repack tool'
 setup(
     console=[{"script":'baker.py', "dest_base":"baker_core"}],
     zipfile=None,
-    options={'py2exe': {'includes': [],
+    options={'py2exe': {'includes': ["sip"],
                         'bundle_files': 1, 'compressed': True}},
     name='Baker Core',
     version=version,

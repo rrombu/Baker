@@ -286,7 +286,7 @@ class Ui_MainWindow(object):
         from os import path, remove
         global dir_path
 
-        if not path.exists('splash'):
+        if not path.exists('{}\\splash'.format(workdir)):
             urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=0BzO4LREgLV3SaVNiYlhseFlLM1k",
                                        "splash")
         splash_pix = QtGui.QPixmap("{}\\splash".format(workdir))
@@ -299,16 +299,18 @@ class Ui_MainWindow(object):
         splash.showMessage("{}Starting...".format('\n'*11),
                            QtCore.Qt.AlignAbsolute, QtCore.Qt.white)
         splash.show()
-        if not (path.exists('ffprobe.exe') or path.exists('mkvmerge.exe') or path.exists('x264.exe')):
+        if not (path.exists('{}\\ffprobe.exe'.format(workdir))
+                or path.exists('{}\\mkvmerge.exe'.format(workdir))
+                or path.exists('{}\\x264.exe'.format(workdir))):
             splash.showMessage("{}Downloading necessary tools...".format('\n'*11),
                                QtCore.Qt.AlignAbsolute, QtCore.Qt.white)
             splash.show()
             urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=0BzO4LREgLV3SUW5NbkNYYUIzb2M",
-                                       "baker_tools.zip")
+                                       "{}\\baker_tools.zip".format(workdir))
             from zipfile import ZipFile
-            with ZipFile('baker_tools.zip', "r") as z:
+            with ZipFile('{}\\baker_tools.zip'.format(workdir), "r") as z:
                 z.extractall()
-            remove("baker_tools.zip")
+            remove("{}\\baker_tools.zip".format(workdir))
         else:
             splash.showMessage("{}Welcome to bakery!".format('\n'*11),
                                QtCore.Qt.AlignAbsolute, QtCore.Qt.white)
