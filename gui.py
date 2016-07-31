@@ -283,12 +283,15 @@ class Ui_MainWindow(object):
 
     def checksoft(self, workdir):
         import urllib.request
-        from os import path, remove
+        from os import path, remove, makedirs
         global dir_path
+
+        if not path.exists(workdir):
+            makedirs(workdir)
 
         if not path.exists('{}\\splash'.format(workdir)):
             urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=0BzO4LREgLV3SaVNiYlhseFlLM1k",
-                                       "splash")
+                                       "{}\\splash".format(workdir))
         splash_pix = QtGui.QPixmap("{}\\splash".format(workdir))
         splash = QtGui.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
         font = QtGui.QFont()
@@ -309,7 +312,7 @@ class Ui_MainWindow(object):
                                        "{}\\baker_tools.zip".format(workdir))
             from zipfile import ZipFile
             with ZipFile('{}\\baker_tools.zip'.format(workdir), "r") as z:
-                z.extractall()
+                z.extractall(workdir)
             remove("{}\\baker_tools.zip".format(workdir))
         else:
             splash.showMessage("{}Welcome to bakery!".format('\n'*11),
