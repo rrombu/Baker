@@ -4,6 +4,13 @@ import os
 import subprocess
 import probe
 
+__author__ = "Roman Budnik"
+__copyright__ = "Copyright 2014-2016"
+__credits__ = ["Roman Budnik"]
+__license__ = "LGPL"
+__version__ = "0.9.7"
+__maintainer__ = "Roman Budnik"
+__status__ = "Development"
 
 class Converter(QThread):
     if __name__ != "__main__":

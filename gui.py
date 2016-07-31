@@ -1,5 +1,13 @@
 from PyQt4 import QtCore, QtGui
 
+__author__ = "Roman Budnik"
+__copyright__ = "Copyright 2014-2016"
+__credits__ = ["Roman Budnik"]
+__license__ = "LGPL"
+__version__ = "0.9.7"
+__maintainer__ = "Roman Budnik"
+__status__ = "Development"
+
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
