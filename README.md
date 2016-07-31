@@ -42,12 +42,12 @@ Run baker&#46;py with Python or baker_core.exe providing necessary parameters an
 
 #### Parameters
 * **-p <absolute path>** - absolute path to a folder with video files
-* **-a <folder name>** - name of the subfolder inside main folder (provided with -p flag) containing desired audio-tracks
-* **-s <folder name>** - name of the subfolder inside main folder (provided with -p flag) containing desired subtitles
+* **-a <folder name>** (optional) - name of the subfolder inside main folder (provided with -p flag) containing desired audio-tracks
+* **-s <folder name>** (optional) - name of the subfolder inside main folder (provided with -p flag) containing desired subtitles
 * **-f <number>** - file number to proceed from
 * **-t <number>** - file number to proceed last
-* **-P <x264 mode name>** - x264 presets (ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo).
-Used for using fast presets (overwrites all parameters from configuration file in this case).
+* **-P <x264 mode name>** (optional) - x264 presets (ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo).
+If supplied - overwrites all parameters set in config file.
 More info can be found here: https://trac.ffmpeg.org/wiki/Encode/H.264#a2.Chooseapreset
-* **-c** - file needs to be encoded (converted)
-* **-v** - toggles output from x264 and mkvmerge
+* **-c** (optional) - file needs to be encoded (converted)
+* **-v** (optional) - toggles output from x264 and mkvmerge

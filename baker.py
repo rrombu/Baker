@@ -36,13 +36,11 @@ class Converter(QThread):
         self.first = 0
         self.last = 0
         self.params = ""
-        for flag in settings["x264"]:
-            if flag == "preset" and "fast" in performance:
-                self.params = "--preset {} ".format(performance)
-                break
-            self.params += "--{} {} ".format(flag, settings["x264"][flag])
-        if performance == "lightweight":
-           self.params = "--threads 1 {}".format(self.params)
+        if performance:
+            self.params = "--preset {} ".format(performance)
+        else:
+            for flag in settings["x264"]:
+                self.params += "--{} {} ".format(flag, settings["x264"][flag])
         self.verbose = False
         self.anime = anime
         print("Converter initialized.")
@@ -169,6 +167,9 @@ if __name__ == "__main__":
     convert = False
     verbose = False
     lightweight = False
+    performance = False
+    audio = False
+    subtitles = False
     opts, args = getopt(sys.argv[1:], "p:a:s:f:t:P:cv")
     '''
     p - Path to title folder
@@ -189,6 +190,19 @@ if __name__ == "__main__":
         elif opt == "-c": convert = True
         elif opt == "-v": verbose = True
         elif opt == "-P": performance = arg
+
+    if "path" not in locals():
+        print("[ERROR] Specify path with -p paramter!")
+        exit(1)
+    if "fromep" not in locals():
+        print("[ERROR] Specify file number to start from with -f parameter!")
+        exit(1)
+    if "toep" not in locals():
+        print("[ERROR] Specify file number on which to end process with -f parameter!")
+        exit(1)
+    if not convert and not (audio or subtitles):
+        print("[ERROR] Nothing to pack and no conversion asked. Nothing to do here. Goodbye!")
+
     print("Command line parameters read.")
     anime = Anime(path)
     converter = Converter(anime, performance=performance)
