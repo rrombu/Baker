@@ -23,5 +23,6 @@ setup(
 
 copyfile("config.json", "dist\\config.json")
 copyfile("README.md", "dist\\README.md")
+copyfile("LICENSE.txt", "dist\\LICENSE.txt")
 rmtree('build')
 rmtree('__pycache__')
