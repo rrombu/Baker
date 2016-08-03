@@ -1,10 +1,12 @@
+import pkgutil
+import logging
 from PyQt4 import QtCore, QtGui
 
 __author__ = "Roman Budnik"
 __copyright__ = "Copyright 2014-2016"
 __credits__ = ["Roman Budnik"]
 __license__ = "LGPL"
-__version__ = "0.9.7"
+__version__ = "0.9.8"
 __maintainer__ = "Roman Budnik"
 __status__ = "Development"
 
@@ -28,6 +30,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(300, 320)
+        icon = QtGui.QPixmap()
+        icon.loadFromData(pkgutil.get_data(__name__, 'resources/gui.ico'), "ico")
+        MainWindow.setWindowIcon(QtGui.QIcon(icon))
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.verticalLayout_2 = QtGui.QVBoxLayout(self.centralwidget)
@@ -272,7 +277,11 @@ class Ui_MainWindow(object):
         from title import Anime
         from baker import Converter
 
+        logging.debug("> gui.open")
         folder = QtGui.QFileDialog.getExistingDirectory(None, "Choose folder", QtCore.QDir.currentPath())
+        if not folder:
+            logging.error("You must choose a folder with video files!")
+            exit(1)
         global anime
         anime = Anime(folder)
         self.vPathLabel.setText(folder)
@@ -288,19 +297,19 @@ class Ui_MainWindow(object):
         self.audioCheck.setChecked(False)
         self.subCheck.setChecked(False)
         self.bakeButton.setDisabled(True)
+        logging.debug("< gui.open")
 
     def checksoft(self, workdir):
         import urllib.request
         from os import path, remove, makedirs
         global dir_path
 
+        logging.debug("> gui.checksoft")
         if not path.exists(workdir):
             makedirs(workdir)
 
-        if not path.exists('{}\\splash'.format(workdir)):
-            urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=0BzO4LREgLV3SaVNiYlhseFlLM1k",
-                                       "{}\\splash".format(workdir))
-        splash_pix = QtGui.QPixmap("{}\\splash".format(workdir))
+        splash_pix = QtGui.QPixmap()
+        splash_pix.loadFromData(pkgutil.get_data(__name__, 'resources/splash'), "png")
         splash = QtGui.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Calibri"))
@@ -328,12 +337,16 @@ class Ui_MainWindow(object):
             import time
             time.sleep(1)
         splash.finish(None)
+        logging.debug("< gui.checksoft")
 
     def set_convert(self, need):
+        logging.debug("> gui.set_convert")
         self.converter.need_convert = need
         self.bakeButton.setEnabled(need)
+        logging.debug("< gui.convert")
 
     def set_audio(self, need):
+        logging.debug("> gui.set_audio")
         if need:
             self.audioBox.show()
             self.audioBox.addItems(list(anime.audio.keys()))
@@ -342,8 +355,10 @@ class Ui_MainWindow(object):
             self.audioBox.clear()
             self.converter.audio = [False, '', '']
         self.bakeButton.setEnabled(need)
+        logging.debug("< gui.set_audio")
 
     def set_subs(self, need):
+        logging.debug("> gui.set_subs")
         if need:
             self.subBox.show()
             self.subBox.addItems(list(anime.subtitles.keys()))
@@ -352,8 +367,10 @@ class Ui_MainWindow(object):
             self.subBox.clear()
             self.converter.subs = [False, '', '']
         self.bakeButton.setEnabled(need)
+        logging.debug("< gui.set_subs")
 
     def bake(self):
+        logging.debug("> gui.bake")
         if self.audioBox.currentText() != '':
             self.converter.audio = [True,
                                     anime.audio[self.audioBox.currentText()]["path"],
@@ -378,21 +395,25 @@ class Ui_MainWindow(object):
         self.converter.last = self.endBox.value()
         self.converter.finished.connect(self.unlock, QtCore.Qt.QueuedConnection)
         self.converter.start()
+        logging.debug("< gui.bake")
 
     def progress(self, counters):
+        logging.debug("> gui.progress")
         if counters[0] is not None:
             if self.totalProgressBar.value() == -1:
                 self.totalProgressBar.setFormat('%v/{}'.format(self.endBox.value() + 1 - self.startBox.value()))
                 self.totalProgressBar.setTextVisible(True)
                 self.totalProgressBar.setMaximum(self.endBox.value() - self.startBox.value() + 1)
-                print('Set bar length to:', self.endBox.value())
+                logging.debug('Set bar length to:', self.endBox.value())
                 self.totalProgressBar.setValue(0)
             self.totalProgressBar.setValue(counters[0])
-            print('Updated bar to:', self.totalProgressBar.value())
+            logging.debug('Updated bar to:', self.totalProgressBar.value())
         if counters[1] is not None:
             self.episodeProgressBar.setValue(counters[1])
+        logging.debug("< gui.progress")
 
     def unlock(self):
+        logging.debug("> gui.unlock")
         self.convertVideoCheck.setDisabled(False)
         self.audioCheck.setDisabled(False)
         self.subCheck.setDisabled(False)
@@ -401,8 +422,11 @@ class Ui_MainWindow(object):
         self.startBox.setDisabled(False)
         self.endBox.setValue(anime.n())
         self.endBox.setDisabled(False)
+        logging.debug("< gui.unlock")
 
     def abort(self):
+        logging.debug("> gui.abort")
         self.convertVideoCheck.setChecked(False)
         self.audioCheck.setChecked(False)
         self.subCheck.setChecked(False)
+        logging.debug("< gui.abort")

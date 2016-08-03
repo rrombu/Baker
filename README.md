@@ -19,7 +19,7 @@ To use code "as is" your system has to meet some requirements:
 * PyQt 4.11
 
 To build an executable with supplied scripts you'll need additionally:
-* py2exe
+* PyInstaller - just run it with provided spec-files
 
 You can also use built executables from releases, everything needed is supplied with them.
 
@@ -31,14 +31,14 @@ Basic settings are supplied through config-file in JSON format:
 ## Usage
 
 ### GUI
-1. run main&#46;py with Python or baker.exe straight
+1. run main&#46;py with Python or Baker.exe straight
 2. choose folder witch contains video file(s) and subfolder(s) with additions
 3. pick desired actions on the main Windows
 4. press "Bake!" button
 5. wait for it to complete (progress bar for files and overall are provided)
 
 ### CLI
-Run baker&#46;py with Python or baker_core.exe providing necessary parameters and wait for completion.
+Run baker&#46;py with Python or BakerCore.exe providing necessary parameters and wait for completion.
 
 #### Parameters
 * **-p <absolute path>** - absolute path to a folder with video files
@@ -51,3 +51,6 @@ If supplied - overwrites all parameters set in config file.
 More info can be found here: https://trac.ffmpeg.org/wiki/Encode/H.264#a2.Chooseapreset
 * **-c** (optional) - file needs to be encoded (converted)
 * **-v** (optional) - toggles output from x264 and mkvmerge
+
+## Troubleshooting
+Add `-d` parameter to script/executable to get debug output to console and/or file.

@@ -2,21 +2,40 @@ __author__ = "Roman Budnik"
 __copyright__ = "Copyright 2014-2016"
 __credits__ = ["Roman Budnik"]
 __license__ = "LGPL"
-__version__ = "0.9.7"
+__version__ = "0.9.8"
 __maintainer__ = "Roman Budnik"
 __status__ = "Development"
 
 if __name__ == "__main__":
     import sys
     import json
+    import logging
     from gui import Ui_MainWindow
     from PyQt4 import QtGui
     from os import environ
 
-    print("Baker started.")
+    fileLog = logging.FileHandler("Baker.log", 'w')
+    fileLog.setLevel("WARNING")
+    consoleLog = logging.StreamHandler(stream=sys.stdout)
+    consoleLog.setLevel("DEBUG")
+
+    logFormatter = logging.Formatter("[{levelname:^7}] {message}", style='{')
+    fileLog.setFormatter(logFormatter)
+    consoleLog.setFormatter(logFormatter)
+
+    rootLogger = logging.getLogger()
+    rootLogger.setLevel("INFO")
+    rootLogger.handlers = []
+    rootLogger.addHandler(fileLog)
+    rootLogger.addHandler(consoleLog)
+
+    if "-d" in sys.argv:
+        rootLogger.setLevel("DEBUG")
+        fileLog.setLevel("DEBUG")
+
     with open("config.json", "r") as f:
         settings = json.load(f)
-        print("Settings loaded.")
+        logging.debug("Settings from configuration file loaded.")
 
     workdir = settings["tools_location"].replace("%appdata%", environ['APPDATA'])
 
