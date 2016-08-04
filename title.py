@@ -7,7 +7,7 @@ __maintainer__ = "Roman Budnik"
 __status__ = "Development"
 
 class Anime():
-    def __init__(self, path):
+    def __init__(self, path, tooldir):
         import logging
         from os import walk
         from probe import bit_depth
@@ -45,7 +45,7 @@ class Anime():
                 logging.debug("\t\tnone")
         self.quantity = len(self.episodes)
         logging.info("Found {} episodes".format(self.quantity))
-        self.bit_depth = bit_depth('{}\\{}'.format(self.folder, self.episodes[0]))
+        self.bit_depth = bit_depth('{}\\{}'.format(self.folder, self.episodes[0]), tooldir)
         self.v_ext = self.episodes[0][-3:]
         logging.debug("\tVideo format is {}".format(self.v_ext))
         logging.debug("< title.Anime.__init__")

@@ -273,7 +273,7 @@ class Ui_MainWindow(object):
         #self.menuMore.setTitle(_translate("MainWindow", "More", None))
         #self.actionAbout.setText(_translate("MainWindow", "About", None))
 
-    def open(self):
+    def open(self, tooldir):
         from title import Anime
         from baker import Converter
 
@@ -283,7 +283,7 @@ class Ui_MainWindow(object):
             logging.error("You must choose a folder with video files!")
             exit(1)
         global anime
-        anime = Anime(folder)
+        anime = Anime(folder, tooldir)
         self.vPathLabel.setText(folder)
         self.vNumLabel.setText(str(anime.n()))
         self.vBitLabel.setText("{}bit".format(anime.bit_depth))
@@ -404,10 +404,10 @@ class Ui_MainWindow(object):
                 self.totalProgressBar.setFormat('%v/{}'.format(self.endBox.value() + 1 - self.startBox.value()))
                 self.totalProgressBar.setTextVisible(True)
                 self.totalProgressBar.setMaximum(self.endBox.value() - self.startBox.value() + 1)
-                logging.debug('Set bar length to:', self.endBox.value())
+                logging.debug('\tSet bar length to {}'.format(self.endBox.value()))
                 self.totalProgressBar.setValue(0)
             self.totalProgressBar.setValue(counters[0])
-            logging.debug('Updated bar to:', self.totalProgressBar.value())
+            logging.debug('\tUpdated bar to {}'.format(self.totalProgressBar.value()))
         if counters[1] is not None:
             self.episodeProgressBar.setValue(counters[1])
         logging.debug("< gui.progress")

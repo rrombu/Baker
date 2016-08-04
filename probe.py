@@ -2,14 +2,14 @@
 import logging
 
 
-def probe(entry, file):
+def probe(entry, file, tooldir=""):
     from subprocess import Popen, STARTUPINFO, STARTF_USESHOWWINDOW, PIPE
 
     logging.debug("> probe.probe : {} for {}".format(entry, file))
     startupinfo = STARTUPINFO()  # Hide separate window
     startupinfo.dwFlags |= STARTF_USESHOWWINDOW
-    request = u'C:\\Users\\Roman\\AppData\\Roaming\\Baker\\ffprobe.exe -v error -select_streams v -show_entries {} ' \
-              u'-of default=noprint_wrappers=1:nokey=1 "{}"'.format(entry, file)
+    request = u'{}ffprobe.exe -v error -select_streams v -show_entries {} ' \
+              u'-of default=noprint_wrappers=1:nokey=1 "{}"'.format(tooldir, entry, file)
     logging.debug("\tExecuting: {}".format(request))
     result = Popen(request, stdin=PIPE, stdout=PIPE, stderr=PIPE, startupinfo=startupinfo).stdout.read()\
         .decode('utf-8').strip("\r\n")  # Pyinstaller needs everything piped
@@ -17,9 +17,10 @@ def probe(entry, file):
     return result
 
 
-def bit_depth(file):
+def bit_depth(file, tooldir):
     logging.debug("> probe.bit_depth")
-    result = probe('stream=bits_per_raw_sample', file)
+    tooldir="{}\\".format(tooldir)
+    result = probe('stream=bits_per_raw_sample', file, tooldir)
     logging.info("Video has {}-bit depth".format(result))
     logging.debug("< probe.bit_depth")
     return result

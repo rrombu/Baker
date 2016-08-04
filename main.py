@@ -12,7 +12,7 @@ if __name__ == "__main__":
     import logging
     from gui import Ui_MainWindow
     from PyQt4 import QtGui
-    from os import environ
+    from os import environ, path, makedirs
 
     fileLog = logging.FileHandler("Baker.log", 'w')
     fileLog.setLevel("WARNING")
@@ -38,6 +38,9 @@ if __name__ == "__main__":
         logging.debug("Settings from configuration file loaded.")
 
     workdir = settings["tools_location"].replace("%appdata%", environ['APPDATA'])
+    if not path.exists(workdir):
+        makedirs(workdir)
+        logging.debug("Working directory created at {}".format(workdir))
 
     app = QtGui.QApplication(sys.argv)
     app.setStyle(QtGui.QStyleFactory.create("plastique"))
@@ -45,6 +48,6 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     ui.checksoft(workdir)
-    ui.open()
+    ui.open(workdir)
     MainWindow.show()
     sys.exit(app.exec_())

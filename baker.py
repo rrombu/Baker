@@ -210,7 +210,7 @@ if __name__ == "__main__":
     d - log level set to debug
     '''
     for opt, arg in opts:
-        if opt == "-p":   path = arg
+        if opt == "-p":   workpath = arg
         elif opt == "-a": audio = arg
         elif opt == "-s": subtitles = arg
         elif opt == "-f": fromep = int(arg)
@@ -222,7 +222,17 @@ if __name__ == "__main__":
             rootLogger.setLevel("DEBUG")
             fileLog.setLevel("DEBUG")
 
-    if "path" not in locals():
+    with open("config.json", "r") as f:
+        settings = json.load(f)
+        logging.debug("Settings from configuration file loaded.")
+
+    workdir = settings["tools_location"].replace("%appdata%", environ['APPDATA'])
+    print(workdir)
+    if not path.exists(workdir):
+        makedirs(workdir)
+        logging.debug("Working directory created at {}".format(workdir))
+
+    if "workpath" not in locals():
         logging.error("Specify path with -p paramter!")
         input("Press ENTER to exit...")
         exit(1)
@@ -236,7 +246,7 @@ if __name__ == "__main__":
         logging.error("Nothing to pack and no conversion asked. Nothing to do here. Goodbye!")
 
     logging.info("Command line parameters read.")
-    anime = Anime(path)
+    anime = Anime(workpath, workdir)
     converter = Converter(anime, performance=performance)
     converter.setup(fromep, toep, convert, audio, subtitles, verbose)
     converter.run()
