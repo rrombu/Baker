@@ -27,10 +27,10 @@ class Anime():
                 logging.debug("\t\tskipped")
                 continue
             dir[2].sort()
-            if any(entry for tag in ["mkv", "mp4", "m4v", "avi"] for entry in dir[2] if tag in entry):
+            if any(entry for tag in [".mkv", ".mp4", ".m4v", ".avi"] for entry in dir[2] if tag in entry):
                 logging.debug("\t\tvideo")
                 self.episodes = dir[2]
-            elif any(entry for tag in ["mka", "mp3", "aac", "flac"] for entry in dir[2] if tag in entry):
+            elif any(entry for tag in [".mka", ".mp3", ".aac", ".flac"] for entry in dir[2] if tag in entry):
                 logging.debug("\t\taudio")
                 title = dir[0][dir[0].rfind('\\')+1:]
                 self.audio[title] = {"path":dir[0], "items": dir[2]}
@@ -38,7 +38,7 @@ class Anime():
                 logging.debug("\t\tsubtitles")
                 title = dir[0][dir[0].rfind('\\')+1:]
                 self.subtitles[title] = {"path":dir[0], "items":dir[2]}
-            elif any(entry for tag in ["ttf", "otf"] for entry in dir[2] if tag in entry):
+            elif any(entry for tag in [".ttf", ".otf"] for entry in dir[2] if tag in entry):
                 logging.debug("\t\tfonts")
                 self.fonts[dir[0]] = dir[2]
             else:

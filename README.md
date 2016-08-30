@@ -1,5 +1,5 @@
-BakeMyAnime
-===========
+Baker
+=====
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 
@@ -14,17 +14,21 @@ With this tool you can convert one or multiple videos and pack them into MKV con
 
 ## Prerequisites
 To use code "as is" your system has to meet some requirements:
+
 * OS: Windows
 * Python 3 (developed with 3.4)
 * PyQt 4.11
 
+## Build
 To build an executable with supplied scripts you'll need additionally:
-* PyInstaller - just run it with provided spec-files
+
+* PyInstaller - just run it with provided spec-files as only parameter.
 
 You can also use built executables from releases, everything needed is supplied with them.
 
 ## Configuration
 Basic settings are supplied through config-file in JSON format:
+
 * **tools_location** - folder where x264.exe and mkvmerge.exe are stored or will be downloaded by GUI-version
 * **x264** - any performance parameters for x264.exe (see it's documentation)
 
@@ -41,16 +45,16 @@ Basic settings are supplied through config-file in JSON format:
 Run baker&#46;py with Python or BakerCore.exe providing necessary parameters and wait for completion.
 
 #### Parameters
-* **-p <absolute path>** - absolute path to a folder with video files
-* **-a <folder name>** (optional) - name of the subfolder inside main folder (provided with -p flag) containing desired audio-tracks
-* **-s <folder name>** (optional) - name of the subfolder inside main folder (provided with -p flag) containing desired subtitles
-* **-f <number>** - file number to proceed from
-* **-t <number>** - file number to proceed last
-* **-P <x264 mode name>** (optional) - x264 presets (ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo).
+* `-p <absolute path>` - absolute path to a folder with video files
+* `-a <folder name>` (optional) - name of the subfolder inside main folder (provided with -p flag) containing desired audio-tracks
+* `-s <folder name>` (optional) - name of the subfolder inside main folder (provided with -p flag) containing desired subtitles
+* `-f <number>` - file number to proceed from
+* `-t <number>` - file number to proceed last
+* `-P <x264 mode name>` (optional) - x264 presets (ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo).
 If supplied - overwrites all parameters set in config file.
 More info can be found here: https://trac.ffmpeg.org/wiki/Encode/H.264#a2.Chooseapreset
-* **-c** (optional) - file needs to be encoded (converted)
-* **-v** (optional) - toggles output from x264 and mkvmerge
+* `-c` (optional) - file needs to be encoded (converted)
+* `-v` (optional) - toggles output from x264 and mkvmerge
 
 ## Troubleshooting
 Add `-d` parameter to script/executable to get debug output to console and/or file.

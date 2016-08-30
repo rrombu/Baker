@@ -72,8 +72,10 @@ class Converter(QThread):
     def x264(self, folder, file, extension):
         import atexit
         import logging
+        import timeit
 
         logging.info("[x264] Converting:\n\t{} from {}".format(file, folder))
+        timer_start = timeit.default_timer()
         preset = 'x264 --verbose {} -o "'.format(self.params)
         query = '{}{}.x264" "{}\\{}.{}"'.format(preset, file, folder, file, extension)
         frames_to_decode = probe.frames_total("{}\\{}.{}".format(folder, file, extension))
@@ -101,13 +103,16 @@ class Converter(QThread):
             logging.error("[x264][ERROR] x264 exited with code {}!".format(x.returncode))
             exit(1)
         else:
-            logging.info("[x264] Conversion completed.")
+            elapsed = timeit.default_timer() - timer_start
+            logging.info("[x264] Conversion completed in {}min {:.2f}s.".format(int(elapsed//60), elapsed%60))
         atexit.unregister(x.kill)
 
     def mkvmerge(self, folder, file, fonts):
         import logging
+        import timeit
 
         logging.info("[mkvmerge] Merging:\n\t{} from {}".format(file, folder))
+        timer_start = timeit.default_timer()
         if not os.path.exists(folder + '\\Baked'):
             os.makedirs(folder + '\\Baked')
         v = '"{}\\{}.mkv" '.format(folder, file)
@@ -142,7 +147,8 @@ class Converter(QThread):
             logging.error("[mkvmerge][ERROR] mkvmerge exited with code {}!".format(ret))
             exit(1)
         else:
-            logging.info("[mkvmerge] Merging completed.")
+            elapsed = timeit.default_timer() - timer_start
+            logging.info("[mkvmerge] Merging completed in {}min {:.2f}s.".format(int(elapsed//60), elapsed%60))
 
     def run(self):
         import logging
