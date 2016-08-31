@@ -2,7 +2,7 @@ __author__ = "Roman Budnik"
 __copyright__ = "Copyright 2014-2016"
 __credits__ = ["Roman Budnik"]
 __license__ = "LGPL"
-__version__ = "0.9.8"
+__version__ = "0.9.9"
 __maintainer__ = "Roman Budnik"
 __status__ = "Development"
 
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     from os import environ, path, makedirs
 
     fileLog = logging.FileHandler("Baker.log", 'w')
-    fileLog.setLevel("WARNING")
+    fileLog.setLevel("INFO")
     consoleLog = logging.StreamHandler(stream=sys.stdout)
     consoleLog.setLevel("DEBUG")
 

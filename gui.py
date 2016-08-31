@@ -6,7 +6,7 @@ __author__ = "Roman Budnik"
 __copyright__ = "Copyright 2014-2016"
 __credits__ = ["Roman Budnik"]
 __license__ = "LGPL"
-__version__ = "0.9.8"
+__version__ = "0.9.9"
 __maintainer__ = "Roman Budnik"
 __status__ = "Development"
 
@@ -200,19 +200,19 @@ class Ui_MainWindow(object):
         self.episodeProgressBar.setObjectName(_fromUtf8("episodeProgressBar"))
         self.verticalLayout_2.addWidget(self.episodeProgressBar)
         MainWindow.setCentralWidget(self.centralwidget)
-        #self.menubar = QtGui.QMenuBar(MainWindow)
-        #self.menubar.setGeometry(QtCore.QRect(0, 0, 428, 18))
-        #self.menubar.setObjectName(_fromUtf8("menubar"))
-        #self.menuMore = QtGui.QMenu(self.menubar)
-        #self.menuMore.setObjectName(_fromUtf8("menuMore"))
-        #MainWindow.setMenuBar(self.menubar)
+        self.menubar = QtGui.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 428, 18))
+        self.menubar.setObjectName(_fromUtf8("menubar"))
+        self.menuMore = QtGui.QMenu(self.menubar)
+        self.menuMore.setObjectName(_fromUtf8("menuMore"))
+        MainWindow.setMenuBar(self.menubar)
         #self.statusbar = QtGui.QStatusBar(MainWindow)
         #self.statusbar.setObjectName(_fromUtf8("statusbar"))
         #MainWindow.setStatusBar(self.statusbar)
-        #self.actionAbout = QtGui.QAction(MainWindow)
-        #self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
-        #self.menuMore.addAction(self.actionAbout)
-        #self.menubar.addAction(self.menuMore.menuAction())
+        self.actionAbout = QtGui.QAction(MainWindow)
+        self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
+        self.menuMore.addAction(self.actionAbout)
+        self.menubar.addAction(self.menuMore.menuAction())
 
         self.retranslateUi(MainWindow)
         self.settingsTabs.setCurrentIndex(0)
@@ -222,6 +222,7 @@ class Ui_MainWindow(object):
         self.bakeButton.clicked.connect(self.bake)
         self.folderButton.clicked.connect(self.open)
         self.startBox.valueChanged.connect(lambda l: self.endBox.setMinimum(l))
+        self.actionAbout.triggered.connect(self.about)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.tTitleLabel.hide()
@@ -240,6 +241,12 @@ class Ui_MainWindow(object):
         self.totalProgressBar.hide()
         self.episodeProgressBar.hide()
         self.progressLabel.hide()
+
+    def about(self):
+        Dialog = QtGui.QDialog()
+        dui = aboutDialog()
+        dui.setupUi(Dialog)
+        Dialog.exec_()
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "Baker", None))
@@ -270,8 +277,8 @@ class Ui_MainWindow(object):
         self.bakeButton.setText(_translate("MainWindow", "Bake!", None))
         self.progressLabel.setText(_translate("MainWindow", "TextLabel", None))
         self.folderButton.setText(_translate("MainWindow", "Choose folder", None))
-        #self.menuMore.setTitle(_translate("MainWindow", "More", None))
-        #self.actionAbout.setText(_translate("MainWindow", "About", None))
+        self.menuMore.setTitle(_translate("MainWindow", "More", None))
+        self.actionAbout.setText(_translate("MainWindow", "About", None))
 
     def open(self, tooldir):
         from title import Anime
@@ -430,3 +437,74 @@ class Ui_MainWindow(object):
         self.audioCheck.setChecked(False)
         self.subCheck.setChecked(False)
         logging.debug("< gui.abort")
+
+class aboutDialog(object):
+    def setupUi(self, Dialog):
+        Dialog.setObjectName(_fromUtf8("Dialog"))
+        Dialog.setMinimumSize(250, 200)
+        Dialog.setMaximumSize(250, 200)
+        icon = QtGui.QPixmap()
+        icon.loadFromData(pkgutil.get_data(__name__, 'resources/gui.ico'), "ico")
+        Dialog.setWindowIcon(QtGui.QIcon(icon))
+        self.gridLayout = QtGui.QGridLayout(Dialog)
+        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        self.verticalLayout = QtGui.QVBoxLayout()
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.ico = QtGui.QLabel(Dialog)
+        self.ico.setObjectName(_fromUtf8("ico"))
+        self.ico.setAlignment(QtCore.Qt.AlignCenter)
+        icon = icon.scaledToHeight(128)
+        self.ico.setPixmap(icon)
+        self.verticalLayout.addWidget(self.ico)
+        self.app = QtGui.QLabel(Dialog)
+        self.app.setObjectName(_fromUtf8("app"))
+        self.verticalLayout.addWidget(self.app)
+        self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
+        self.line = QtGui.QFrame(Dialog)
+        self.line.setFrameShape(QtGui.QFrame.HLine)
+        self.line.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line.setObjectName(_fromUtf8("line"))
+        self.gridLayout.addWidget(self.line, 1, 0, 1, 1)
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
+        self.verticalLayout_3 = QtGui.QVBoxLayout()
+        self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
+        self.author = QtGui.QLabel(Dialog)
+        self.author.setObjectName(_fromUtf8("author"))
+        self.verticalLayout_3.addWidget(self.author)
+        self.github = QtGui.QLabel(Dialog)
+        self.github.setObjectName(_fromUtf8("github"))
+        self.verticalLayout_3.addWidget(self.github)
+        self.horizontalLayout.addLayout(self.verticalLayout_3)
+        self.verticalLayout_2 = QtGui.QVBoxLayout()
+        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
+        self.authorName = QtGui.QLabel(Dialog)
+        self.authorName.setObjectName(_fromUtf8("authorName"))
+        self.verticalLayout_2.addWidget(self.authorName)
+        self.githubLink = QtGui.QLabel(Dialog)
+        self.githubLink.setObjectName(_fromUtf8("githubLink"))
+        self.verticalLayout_2.addWidget(self.githubLink)
+        self.horizontalLayout.addLayout(self.verticalLayout_2)
+        self.gridLayout.addLayout(self.horizontalLayout, 2, 0, 1, 1)
+        self.license = QtGui.QLabel(Dialog)
+        self.license.setMaximumSize(QtCore.QSize(16777215, 21))
+        self.license.setObjectName(_fromUtf8("license"))
+        self.gridLayout.addWidget(self.license, 3, 0, 1, 1)
+
+        self.retranslateUi(Dialog)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        Dialog.setWindowTitle(_translate("Dialog", "About", None))
+        self.app.setText(_translate("Dialog", "<html><head/><body><p align=\"center\">Baker v.{}</p></body></html>"
+                                    .format(__version__), None))
+        self.author.setText(_translate("Dialog", "Author", None))
+        self.github.setText(_translate("Dialog", "GitHub link", None))
+        self.authorName.setText(_translate("Dialog", "<html><head/><body><p align=\"right\">{}</p></body></html>"
+                                           .format(__author__), None))
+        self.githubLink.setText(_translate("Dialog",
+                                           "<html><head/><body><p align=\"right\"><a href=\"https://github.com/budrom/Baker\">"
+                                           "<span style=\" text-decoration: underline; color:#0000ff;\">"
+                                           "github.com/budrom/Baker</span></a></p></body></html>", None))
+        self.license.setText(_translate("Dialog", "<html><head/><body><p align=\"center\">Licensed under {}, {}"
+                                                  "</p></body></html>".format(__license__,__copyright__), None))

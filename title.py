@@ -2,7 +2,7 @@ __author__ = "Roman Budnik"
 __copyright__ = "Copyright 2014-2016"
 __credits__ = ["Roman Budnik"]
 __license__ = "LGPL"
-__version__ = "0.9.8"
+__version__ = "0.9.9"
 __maintainer__ = "Roman Budnik"
 __status__ = "Development"
 
@@ -29,7 +29,10 @@ class Anime():
             dir[2].sort()
             if any(entry for tag in [".mkv", ".mp4", ".m4v", ".avi"] for entry in dir[2] if tag in entry):
                 logging.debug("\t\tvideo")
-                self.episodes = dir[2]
+                if self.episodes:  # dirty trick for skipping subfolders with videos
+                    logging.debug("\t\t\talready filled - skipping")
+                else:
+                    self.episodes = dir[2]
             elif any(entry for tag in [".mka", ".mp3", ".aac", ".flac"] for entry in dir[2] if tag in entry):
                 logging.debug("\t\taudio")
                 title = dir[0][dir[0].rfind('\\')+1:]
