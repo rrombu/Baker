@@ -29,8 +29,9 @@ You can also use built executables from releases, everything needed is supplied 
 ## Configuration
 Basic settings are supplied through config-file in JSON format:
 
-* **tools_location** - folder where x264.exe and mkvmerge.exe are stored or will be downloaded by GUI-version
-* **x264** - any performance parameters for x264.exe (see it's documentation)
+* `open_path` - default path which is opened in folder select prompt
+* `tools_location` - folder where x264.exe and mkvmerge.exe are stored or will be downloaded by GUI-version
+* `x264` - any performance parameters for x264.exe (see it's documentation)
 
 ## Usage
 

@@ -1,4 +1,5 @@
 {
+  "open_path": "C:\\Тест\\test",
   "tools_location": "%appdata%\\Baker",
   "x264": {
     "preset": "slower",

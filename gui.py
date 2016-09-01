@@ -280,12 +280,12 @@ class Ui_MainWindow(object):
         self.menuMore.setTitle(_translate("MainWindow", "More", None))
         self.actionAbout.setText(_translate("MainWindow", "About", None))
 
-    def open(self, tooldir):
+    def open(self, tooldir, collection=QtCore.QDir.currentPath()):
         from title import Anime
         from baker import Converter
 
         logging.debug("> gui.open")
-        folder = QtGui.QFileDialog.getExistingDirectory(None, "Choose folder", QtCore.QDir.currentPath())
+        folder = QtGui.QFileDialog.getExistingDirectory(None, "Choose folder", collection)
         if not folder:
             logging.error("You must choose a folder with video files!")
             exit(1)

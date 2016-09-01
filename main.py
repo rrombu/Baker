@@ -33,7 +33,7 @@ if __name__ == "__main__":
         rootLogger.setLevel("DEBUG")
         fileLog.setLevel("DEBUG")
 
-    with open("config.json", "r") as f:
+    with open("config.json", "r", encoding="utf-8") as f:
         settings = json.load(f)
         logging.debug("Settings from configuration file loaded.")
 
@@ -48,6 +48,9 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     ui.checksoft(workdir)
-    ui.open(workdir)
+    try:
+        ui.open(workdir, videofolder=settings["open_path"])
+    except KeyError:
+        ui.open(workdir)
     MainWindow.show()
     sys.exit(app.exec_())
