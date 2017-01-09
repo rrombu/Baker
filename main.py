@@ -49,7 +49,7 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     ui.checksoft(workdir)
     try:
-        ui.open(workdir, videofolder=settings["open_path"])
+        ui.open(workdir, collection=settings["open_path"])
     except KeyError:
         ui.open(workdir)
     MainWindow.show()
